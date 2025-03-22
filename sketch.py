@@ -1,8 +1,17 @@
 import json
 from urllib import request
 import re
+import sys
 
-# This is based on your workflow JSON
+if len(sys.argv) != 2:
+    print("Usage: python sketch.py {input_name.png}")
+    sys.exit(1)
+
+input_name = sys.argv[1]
+output_name = input_name.split(".")[0]
+
+print(f"Input image: {output_name}")
+
 prompt_text = """
 {
   "3": {
@@ -88,7 +97,7 @@ prompt_text = """
   },
   "10": {
     "inputs": {
-      "image": "your_input.jpg"
+      "image": \""""+input_name+""""
     },
     "class_type": "LoadImage",
     "_meta": {
@@ -113,7 +122,7 @@ prompt_text = """
   },
   "17": {
     "inputs": {
-      "filename_prefix": "ComfyUI",
+      "filename_prefix": \"Sketch_"""+output_name+"""\",
       "images": [
         "8",
         0
@@ -126,7 +135,6 @@ prompt_text = """
   }
 }
 """
-
 
 def escape_json_control_chars(text):    
     return re.sub(r'[\x00-\x1F]', '', text)
