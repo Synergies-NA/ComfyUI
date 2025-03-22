@@ -55,7 +55,7 @@ prompt_text = """
   },
   "6": {
     "inputs": {
-      "text": "A hand-drawn pencil sketch",
+      "text": "Disney-style beauty, ultra-detailed face, big sparkling eyes, delicate features, soft lighting, cinematic, Disney animation, Pixar-like render, fairy tale character, charming smile, highly detailed, vibrant colors, soft shading, fantasy atmosphere, magical world.",
       "clip": [
         "4",
         1
@@ -68,7 +68,7 @@ prompt_text = """
   },
   "7": {
     "inputs": {
-      "text": "embedding:verybadimagenegative_v1.3, blurry, low resolution, bad anatomy, extra limbs, extra fingers, deformed, oversaturated, color, painting, digital coloring, photorealistic, 3D render, soft shading, vibrant colors.\n",
+      "text": "embedding:verybadimagenegative_v1.3, blurry, deformed, disfigured, extra fingers, extra limbs, distorted face, bad anatomy, low quality, text, watermark, extra eyes, asymmetrical face, ugly\n",
       "clip": [
         "4",
         1
