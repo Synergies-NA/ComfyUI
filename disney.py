@@ -3,12 +3,13 @@ from urllib import request
 import re
 import sys
 
-if len(sys.argv) != 2:
-    print("Usage: python sketch.py {input_name.png}")
+if len(sys.argv) != 3:
+    print("Usage: python sketch.py {input_name.png} {job_id}")
     sys.exit(1)
 
 input_name = sys.argv[1]
 output_name = input_name.split(".")[0]
+job_id = sys.argv[2]
 
 print(f"Input image: {output_name}")
 
@@ -140,7 +141,7 @@ def escape_json_control_chars(text):
     return re.sub(r'[\x00-\x1F]', '', text)
 
 def queue_prompt(prompt):
-    p = {"prompt": prompt}
+    p = {"prompt": prompt, "job_id": job_id}  # Pass job_id separately
     data = json.dumps(p).encode('utf-8')
     req = request.Request("http://127.0.0.1:8188/prompt", data=data)
     request.urlopen(req)

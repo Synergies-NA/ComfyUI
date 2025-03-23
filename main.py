@@ -11,6 +11,22 @@ import itertools
 import utils.extra_config
 import logging
 
+import sqlite3
+
+def update_job_status(job_id, status):
+    try:
+        conn = sqlite3.connect('../hmlv-ai-models/image_jobs.db')  # Adjust the path if needed
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE jobs SET status = ? WHERE id = ?", 
+            (status, job_id)
+        )
+        conn.commit()
+        conn.close()
+        logging.info(f"Job {job_id} status updated to {status}")
+    except Exception as e:
+        logging.error(f"Failed to update job status for job {job_id}: {e}")
+
 if __name__ == "__main__":
     #NOTE: These do not do anything on core ComfyUI which should already have no communication with the internet, they are for custom nodes.
     os.environ['HF_HUB_DISABLE_TELEMETRY'] = '1'
@@ -169,24 +185,34 @@ def prompt_worker(q, server_instance):
         queue_item = q.get(timeout=timeout)
         if queue_item is not None:
             item, item_id = queue_item
-            execution_start_time = time.perf_counter()
-            prompt_id = item[1]
-            server_instance.last_prompt_id = prompt_id
+            job_id = item[-1]
+            try:
+                execution_start_time = time.perf_counter()
+                prompt_id = item[1]
+                server_instance.last_prompt_id = prompt_id
 
-            e.execute(item[2], prompt_id, item[3], item[4])
-            need_gc = True
-            q.task_done(item_id,
-                        e.history_result,
-                        status=execution.PromptQueue.ExecutionStatus(
-                            status_str='success' if e.success else 'error',
-                            completed=e.success,
-                            messages=e.status_messages))
-            if server_instance.client_id is not None:
-                server_instance.send_sync("executing", {"node": None, "prompt_id": prompt_id}, server_instance.client_id)
+                e.execute(item[2], prompt_id, item[3], item[4])
+                need_gc = True
+                q.task_done(item_id,
+                            e.history_result,
+                            status=execution.PromptQueue.ExecutionStatus(
+                                status_str='success' if e.success else 'error',
+                                completed=e.success,
+                                messages=e.status_messages))
+                if server_instance.client_id is not None:
+                    server_instance.send_sync("executing", {"node": None, "prompt_id": prompt_id}, server_instance.client_id)
 
-            current_time = time.perf_counter()
-            execution_time = current_time - execution_start_time
-            logging.info("Prompt executed in {:.2f} seconds".format(execution_time))
+                current_time = time.perf_counter()
+                execution_time = current_time - execution_start_time
+                logging.info("Prompt executed in {:.2f} seconds".format(execution_time))
+                
+                if job_id is not None:
+                    update_job_status(job_id, "completed")
+            except Exception as e:
+                logging.error(f"Error executing prompt: {e}")
+                
+                if job_id is not None:
+                    update_job_status(job_id, "failed")
 
         flags = q.get_flags()
         free_memory = flags.get("free_memory", False)
