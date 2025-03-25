@@ -3,7 +3,7 @@ from urllib import request
 import re
 import sys
 
-if len(sys.argv) != 2:
+if len(sys.argv) != 3:
     print("Usage: python sketch.py {input_name.png} {job_id}")
     sys.exit(1)
 
@@ -123,7 +123,7 @@ prompt_text = """
   },
   "17": {
     "inputs": {
-      "filename_prefix": \"Sketch_"""+output_name+"""\",
+      "filename_prefix": \"sketch_"""+output_name+"""\",
       "images": [
         "8",
         0

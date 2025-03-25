@@ -123,7 +123,7 @@ prompt_text = """
   },
   "17": {
     "inputs": {
-      "filename_prefix": \"Disney_"""+output_name+"""\",
+      "filename_prefix": \"disney_"""+output_name+"""\",
       "images": [
         "8",
         0
